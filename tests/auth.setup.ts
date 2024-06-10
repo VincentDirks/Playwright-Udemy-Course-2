@@ -1,19 +1,25 @@
 import { test as setup } from "@playwright/test"
+import user from "../.auth/user.json"
+import fs from "fs"
 
 const authfile = ".auth/user.json"
 
-setup("authentication", async ({ page }) => {
-  await page.goto("https://conduit.bondaracademy.com/")
-  await page.getByText("Sign in").click()
-  await page
-    .getByRole("textbox", { name: "Email" })
-    .fill("conduit@dirksonline.net")
-  await page
-    .getByRole("textbox", { name: "Password" })
-    .fill("qB85R86#ZMKME$jVEVq#vJMDr*A!cJk")
-  await page.getByRole("button").click()
+setup("authentication", async ({ request }) => {
+  const response = await request.post(
+    "https://conduit-api.bondaracademy.com/api/users/login",
+    {
+      data: {
+        user: {
+          email: "conduit@dirksonline.net",
+          password: "qB85R86#ZMKME$jVEVq#vJMDr*A!cJk",
+        },
+      },
+    }
+  )
+  const responseBody = await response.json()
+  const accessToken = responseBody.user.token
 
-  await page.waitForResponse('https://conduit-api.bondaracademy.com/api/tags')
-                              
-  await page.context().storageState({ path: authfile })
+  user.origins[0].localStorage[0].value = accessToken
+  fs.writeFileSync(authfile, JSON.stringify(user))
+  process.env['ACCESS_TOKEN'] = accessToken
 })

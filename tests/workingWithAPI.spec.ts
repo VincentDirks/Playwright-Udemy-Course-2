@@ -37,20 +37,6 @@ test("has title", async ({ page }) => {
 })
 
 test("Delete Article", async ({ page, request }) => {
-  const response = await request.post(
-    "https://conduit-api.bondaracademy.com/api/users/login",
-    {
-      data: {
-        user: {
-          email: "conduit@dirksonline.net",
-          password: "qB85R86#ZMKME$jVEVq#vJMDr*A!cJk",
-        },
-      },
-    }
-  )
-  const responseBody = await response.json()
-  const accessToken = responseBody.user.token
-
   const articleResponse = await request.post(
     "https://conduit-api.bondaracademy.com/api/articles/",
     {
@@ -61,9 +47,6 @@ test("Delete Article", async ({ page, request }) => {
           body: "Test body",
           tagList: [],
         },
-      },
-      headers: {
-        Authorization: `Token ${accessToken}`,
       },
     }
   )
@@ -114,29 +97,9 @@ test("create article", async ({ page, request }) => {
   )
 
   // Clean up
-  // Obtain access token for API call
-  const response = await request.post(
-    "https://conduit-api.bondaracademy.com/api/users/login",
-    {
-      data: {
-        user: {
-          email: "conduit@dirksonline.net",
-          password: "qB85R86#ZMKME$jVEVq#vJMDr*A!cJk",
-        },
-      },
-    }
-  )
-  const responseBody = await response.json()
-  const accessToken = responseBody.user.token
-
   // delete the article using the slug extracted earlier
   const articleDeleteResponse = await request.delete(
-    `https://conduit-api.bondaracademy.com/api/articles/${slugID}`,
-    {
-      headers: {
-        Authorization: `Token ${accessToken}`,
-      },
-    }
+    `https://conduit-api.bondaracademy.com/api/articles/${slugID}`
   )
   expect(articleDeleteResponse.status()).toEqual(204)
 })
