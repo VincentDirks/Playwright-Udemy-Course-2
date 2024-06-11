@@ -33,10 +33,14 @@ export default defineConfig({
     },
   },
 
+  globalSetup: require.resolve("./global-setup.ts"),
+  globalTeardown: require.resolve("./global-teardown.ts"),
+
   projects: [
     { name: "setup", testMatch: "auth.setup.ts" },
     {
       name: "regression",
+      testIgnore: "likesCounter.spec.ts",
       use: { ...devices["Desktop Chrome"], storageState: ".auth/user.json" },
       dependencies: ["setup"],
     },
@@ -55,6 +59,11 @@ export default defineConfig({
       testMatch: "likesCounter.spec.ts",
       use: { ...devices["Desktop Chrome"], storageState: ".auth/user.json" },
       dependencies: ["articleSetup"],
+    },
+    {
+      name: "likeCounterGlobal",
+      testMatch: "likesCounterGlobal.spec.ts",
+      use: { ...devices["Desktop Chrome"], storageState: ".auth/user.json" },
     },
   ],
 })
